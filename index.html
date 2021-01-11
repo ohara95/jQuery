@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jQuery</title>
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="wrapper">
+      <h1>数字当てゲーム</h1>
+      <p>1~100までを当てる</p>
+      <div>
+        残り
+        <span id="count_down">2</span>回
+      </div>
+      <form id="submit">
+        <input type="number" style="padding: 5px" id="input" />
+        <button id="button">決定</button>
+      </form>
+      <span id="advice"></span>
+      <div style="color: red">前回の予想:<span id="memory"></span></div>
+      <span id="new_button"></span>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+      "use strict";
+      let count = 2;
+      let memory = [];
+      const answer = 50;
+      const reset_advice = () => {
+        $("#advice").remove();
+        $('input[type="number"]').val("");
+      };
+
+      $(document).ready(() => {
+        $("form button").click((e) => {
+          e.preventDefault();
+          const input_num = $('input[type="number"]').val();
+          validation(input_num);
+          count--;
+          $("#count_down").text(count);
+          if (answer === parseInt(input_num)) {
+            alert("正解！！");
+            return game_set();
+          } else if (answer <= parseInt(input_num)) {
+            $("#advice").text("もっと下です");
+            setTimeout(reset_advice, 2000);
+          } else if (answer >= parseInt(input_num)) {
+            $("#advice").text("もっと上です");
+            setTimeout(reset_advice, 2000);
+          }
+          memory.push(input_num);
+          $("#memory").append(`${memory[memory.length - 1]},`);
+          if (count === 0) {
+            alert("ゲームオーバー");
+            return game_set();
+          }
+        });
+
+        const validation = (num) => {
+          if (num <= 0) {
+            return alert("0以上の数字を入力してください");
+          }
+          if (memory.includes(num)) {
+            return alert("前回予想した数字です");
+          }
+        };
+
+        const game_set = () => {
+          $("#input").prop("disabled", true);
+          $("#button").prop("disabled", true);
+          $("#new_button").append("<button id='new_game'>new game</button>");
+          reset_advice();
+        };
+
+        // memo console.log(memory, "追加されてはいるが描画はされない");
+        $("document").on("click", "#new_game", () => {
+          alert("aaa");
+        });
+      });
+    </script>
+  </body>
+</html>
