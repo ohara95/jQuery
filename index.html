@@ -12,7 +12,7 @@
       <p>1~100までを当てる</p>
       <div>
         残り
-        <span id="count_down">2</span>回
+        <span id="count_down"></span>回
       </div>
       <form id="submit">
         <input type="number" style="padding: 5px" id="input" />
@@ -26,11 +26,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
       "use strict";
-      let count = 2;
+      let count = 10;
       let memory = [];
-      const answer = 50;
+      let answer = Math.floor(Math.random() * 100) + 1;
+      $("#count_down").append(count);
+
       const reset_advice = () => {
-        $("#advice").remove();
+        $("#advice").empty();
         $('input[type="number"]').val("");
       };
 
@@ -38,34 +40,50 @@
         $("form button").click((e) => {
           e.preventDefault();
           const input_num = $('input[type="number"]').val();
-          validation(input_num);
-          count--;
-          $("#count_down").text(count);
-          if (answer === parseInt(input_num)) {
-            alert("正解！！");
-            return game_set();
-          } else if (answer <= parseInt(input_num)) {
-            $("#advice").text("もっと下です");
-            setTimeout(reset_advice, 2000);
-          } else if (answer >= parseInt(input_num)) {
-            $("#advice").text("もっと上です");
-            setTimeout(reset_advice, 2000);
-          }
-          memory.push(input_num);
-          $("#memory").append(`${memory[memory.length - 1]},`);
-          if (count === 0) {
-            alert("ゲームオーバー");
-            return game_set();
+          if (validation(input_num)) {
+            count--;
+            $("#count_down").text(count);
+            if (answer === parseInt(input_num)) {
+              alert("正解！！");
+              return game_set();
+            } else if (answer <= parseInt(input_num)) {
+              $("#advice").text("もっと下です");
+              setTimeout(reset_advice, 2000);
+            } else if (answer >= parseInt(input_num)) {
+              $("#advice").text("もっと上です");
+              setTimeout(reset_advice, 2000);
+            }
+            memory.push(input_num);
+            $("#memory").append(`${memory[memory.length - 1]},`);
+            if (count === 0) {
+              alert("ゲームオーバー");
+              return game_set();
+            }
           }
         });
 
         const validation = (num) => {
+          const clear_num = () => $('input[type="number"]').val("");
+          if (!num) {
+            alert("入力してください");
+            return false;
+          }
+          if (num >= 100) {
+            alert("100未満で入力してください");
+            clear_num();
+            return false;
+          }
           if (num <= 0) {
-            return alert("0以上の数字を入力してください");
+            alert("0以上の数字を入力してください");
+            clear_num();
+            return false;
           }
           if (memory.includes(num)) {
-            return alert("前回予想した数字です");
+            alert("前回予想した数字です");
+            clear_num();
+            return false;
           }
+          return true;
         };
 
         const game_set = () => {
@@ -76,8 +94,15 @@
         };
 
         // memo console.log(memory, "追加されてはいるが描画はされない");
-        $("document").on("click", "#new_game", () => {
-          alert("aaa");
+        $("#new_button").on("click", button, () => {
+          $("#input").prop("disabled", false);
+          $("#button").prop("disabled", false);
+          $("#new_button").empty();
+          $("#memory").empty();
+          memory = [];
+          count = 10;
+          $("#count_down").text(count);
+          answer = Math.floor(Math.random() * 100) + 1;
         });
       });
     </script>
